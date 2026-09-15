@@ -97,3 +97,9 @@ Visit `http://localhost:3000`. Set `NEXT_PUBLIC_API_URL` (defaults to
   never touches HTTP; the frontend never touches chemistry — it only
   renders whatever JSON the API returns. This keeps each layer testable in
   isolation.
+
+// Copyright (c) 2026 Aya Khaled Khuris. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for details.
+
+// Molecular Graph Generator (GNN-Powered)
+// Author: Aya Khaled Khuris <aya.khuris@gmail.com>
