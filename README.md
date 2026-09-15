@@ -1,105 +1,124 @@
-# Molecular Graph Generator (GNN-powered)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi)
+![PyTorch Geometric](https://img.shields.io/badge/PyTorch_Geometric-PyG-EE4C2C?logo=pytorch)
+![Next.js](https://img.shields.io/badge/Next.js-14%2B-000000?logo=nextdotjs)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-A production-grade, full-stack application that converts chemical input
-(SMILES strings, drug names, or molecular formulas) into an interactive
-molecular graph and computes latent-space embeddings using a Graph Neural
-Network (Message Passing Neural Network / GCN).
+# 🧬 Molecular Graph Generator (GNN-Powered)
+A production-grade, full-stack application that converts chemical input (SMILES strings, drug names, or molecular formulas) into interactive molecular graphs and computes latent-space embeddings using Graph Neural Networks (MPNN / GCN).
 
-```
-User Input (SMILES / drug name / formula)
-        │
-        ▼
- RDKit / PubChemPy  →  Molecule Validation & Parsing
-        │
-        ▼
- Graph Constructor   →  Atom nodes + Bond edges + Feature Vectors
-        │
-        ▼
- PyTorch Geometric   →  MPNN / GCN Encoder  →  Latent Embedding
-        │
-        ▼
- FastAPI JSON API    →  React/Next.js Frontend  →  Interactive Graph + Embedding Viewer
-```
+تطبيق متكامل يعتمد على شبكات الرسم البياني العصبية (Graph Neural Networks) لتحويل المدخلات الكيميائية (مثل صيغ SMILES أو الأسماء الشائعة للمركبات) إلى تمثيل بياني تفاعلي واستخلاص المتجهات الكامنة (Latent Embeddings).
 
-## Repository layout
+🌱 يهدف هذا المشروع إلى تقديم نموذج برمجي عملي يربط بين الكيمياء الحاسوبية والتعلم العميق، وتسهيل استكشاف الفضاء الجزيئي لبحوث اكتشاف الأدوية وتطوير المحتوى التقني في هذا المجال.
+
+## ⚠️ Disclaimer & Model Status
+The GNN encoder currently ships with randomly initialized weights (see backend/app/services/gnn_model.py). It produces valid, deterministic structural embeddings from molecular topology, but has not been trained on any chemical or pharmacological task.
+
+Embeddings should not be interpreted as predictions of drug activity, safety, or efficacy until a trained checkpoint is loaded (see Training & checkpoints in docs/ARCHITECTURE.md).
+
+
+## 🚀 Features
+🧪 Flexible Chemical Input Parsing: Accepts raw SMILES, common/IUPAC drug names, or molecular formulas resolved via PubChem.
+
+⚛️ Deterministic Graph Featurization: Converts molecules into atom nodes, bond edges, and fixed-size feature vectors via RDKit.
+
+🤖 Modular GNN Embeddings: Dynamic encoder architecture supporting interchangeable GCN and MPNN layers via PyTorch Geometric.
+
+📊 Interactive Graph Visualization: Full-stack integration with Next.js frontend to render dynamic graph topologies and latent vector spaces.
+
+⚡ RESTful API Services: Asynchronous endpoints for parsing, featurization, and inference powered by FastAPI.
+
+
+## 🛠️ Tech Stack
+Backend: Python, FastAPI, PyTorch Geometric (PyG), RDKit, PubChemPy, Pydantic
+
+Frontend: Next.js, TypeScript, Tailwind CSS, Lucide React
+
+DevOps & Testing: Pytest, Uvicorn, OpenAPI / Swagger
+
+## 🧩 Project Structure
 
 ```
 molgnn/
-├── backend/                 FastAPI service, RDKit parsing, GNN model
+├── backend/
 │   ├── app/
-│   │   ├── core/            Configuration & app-wide constants
-│   │   ├── schemas/         Pydantic request/response models
-│   │   ├── services/        Business logic (parsing, graph building, GNN, embeddings)
-│   │   ├── api/             REST route definitions
-│   │   └── main.py          FastAPI application entrypoint
-│   ├── tests/                Unit tests (pytest)
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── main.py
+│   ├── tests/
 │   └── requirements.txt
-├── frontend/                 Next.js + TypeScript + Tailwind UI
+├── frontend/
 │   ├── src/
-│   │   ├── components/       MoleculeGraph, EmbeddingPanel, InputForm
-│   │   ├── lib/               API client
+│   │   ├── components/
+│   │   ├── lib/
 │   │   └── styles/
-│   └── package.json
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── tailwind.config.ts
 ├── docs/
-│   └── ARCHITECTURE.md       Detailed graph-construction & GNN documentation
-└── README.md                 (this file)
+│   └── ARCHITECTURE.md
+└── README.md
 ```
 
-## Quick start
+## ⚙️ Setup & Installation
+1. Backend Setup
+Navigate to the backend directory:
 
-### 1. Backend
+Bash
+```cd backend```
+Create and activate a virtual environment:
 
-```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
+Bash
+ ```python -m venv .venv```
+source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+Install dependencies:
 
-The API will be live at `http://localhost:8000`. Interactive OpenAPI docs
-are auto-generated at `http://localhost:8000/docs`.
+Bash
+```pip install -r requirements.txt```
+Run the API server:
 
-Key endpoints:
+Bash
+```uvicorn app.main:app --reload --port 8000```
+Access OpenAPI docs at http://localhost:8000/docs
 
-| Method | Path                | Description                                             |
-|--------|---------------------|----------------------------------------------------------|
-| POST   | `/api/v1/parse`      | Validate & parse SMILES / name / formula into a molecule  |
-| POST   | `/api/v1/graph`       | Build the molecular graph (nodes, edges, features)        |
-| POST   | `/api/v1/embed`       | Run the GNN and return the latent embedding + graph        |
-| GET    | `/api/v1/health`      | Liveness/readiness probe                                   |
+2. Frontend Setup
+Open a new terminal and navigate to the frontend directory:
 
-### 2. Frontend
+Bash
+```cd frontend```
+Install dependencies:
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Bash
+```npm install```
+Start the development server:
 
-Visit `http://localhost:3000`. Set `NEXT_PUBLIC_API_URL` (defaults to
-`http://localhost:8000`) if your backend runs elsewhere.
+Bash
+```npm run dev```
+Open http://localhost:3000 in your browser.
 
-## Design notes
 
-* **Input flexibility** — a single `/parse` endpoint accepts raw SMILES,
-  a common/IUPAC drug name (resolved via PubChemPy → PubChem REST API), or a
-  molecular formula (resolved via PubChemPy formula search). All paths
-  converge on an RDKit `Mol` object, which is the single source of truth for
-  everything downstream.
-* **Deterministic featurization** — atom/bond featurizers are pure functions
-  with fixed-size, documented output vectors (see `docs/ARCHITECTURE.md`),
-  so the same molecule always produces the same graph tensor, and the model
-  is agnostic to *how* the molecule was originally specified.
-* **Modular GNN** — the encoder is assembled from interchangeable message
-  passing layers (`GCNConv`, `NNConv`/MPNN) via a config object, so new
-  layer types can be added without touching the API or frontend.
-* **Separation of concerns** — RDKit logic never touches PyTorch; the GNN
-  never touches HTTP; the frontend never touches chemistry — it only
-  renders whatever JSON the API returns. This keeps each layer testable in
-  isolation.
+## 🧠 Future Improvements
+Add 3D conformer generation and spatial molecular embedding display 🌐
 
-// Copyright (c) 2026 Aya Khaled Khuris. All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for details.
+Implement multi-objective property prediction metrics (QED, SA Score, Tox21) 📈
 
-// Molecular Graph Generator (GNN-Powered)
-// Author: Aya Khaled Khuris <aya.khuris@gmail.com>
+Support custom pretrained checkpoint loading for target-specific drug discovery 💊
+
+
+## 📩 Contact
+
+**Aya Khaled Khrais**
+
+🌐 [GitHub](https://github.com/aya711git)
+
+📧[Email](aya.khuris@gmail.com)
+
+🖇️[LinkedIn](https://www.linkedin.com/in/aya-khaled-khuris/)
+
+💼 Frontend Developer | Passionate about modern UI/UX |AI Research
+
+✨ شكرًا لزيارتك، وأتمنى أن تجد في هذا المشروع فائدة وإلهامًا 💛
+
+✨ Thank you for visiting! I hope you find inspiration and value in this project 💛
